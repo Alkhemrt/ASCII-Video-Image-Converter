@@ -30,6 +30,7 @@ A web tool that transforms videos and images into real-time ASCII art with custo
 5. Use fullscreen for best experience
 6. Capture frames to save/share your art
 
+## Tech Stack
 | Technology | Purpose |
 |------------|---------|
 | **JavaScript** | Core application logic |
