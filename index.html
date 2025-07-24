@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Video/Image Converter</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="control-panel">
+            <div class="panel-header">
+                <h3></h3>
+                <button id="settingsToggle" class="settings-button">
+                    <i class="fas fa-gear"></i>
+                </button>
+            </div>
+
+            <div class="file-inputs">
+                <label for="fileUpload" class="file-upload-label" id="uploadLabel">
+                    <i class="fas fa-video"></i> Choose Video
+                </label>
+                <label for="imageUpload" class="file-upload-label" id="imageUploadLabel">
+                    <i class="fas fa-image"></i> Choose Image
+                </label>
+                <div class="file-name" id="fileName"></div>
+                <input type="file" id="fileUpload" accept="video/*">
+                <input type="file" id="imageUpload" accept="image/*">
+            </div>
+
+            <div class="video-wrapper">
+                <div class="video-placeholder" id="videoPlaceholder">
+                    <i class="fas fa-photo-film"></i><br>
+                    Media Preview
+                </div>
+                <video id="video" playsinline loop></video>
+                <canvas id="imageCanvas" style="display: none;"></canvas>
+            </div>
+
+            <div class="controls">
+                <div class="toggle-row">
+                    <span class="toggle-label">Inverted Mode:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="invertedToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="slider-control">
+                    <label for="resolutionSlider">Resolution: <span id="resolutionValue">100</span></label>
+                    <input type="range" id="resolutionSlider" min="20" max="200" value="100">
+                </div>
+
+                <div class="slider-control">
+                    <label for="contrastSlider">Contrast: <span id="contrastValue">100</span>%</label>
+                    <input type="range" id="contrastSlider" min="50" max="150" value="100">
+                </div>
+
+                <div class="slider-control">
+                    <label for="brightnessSlider">Brightness: <span id="brightnessValue">100</span>%</label>
+                    <input type="range" id="brightnessSlider" min="50" max="150" value="100">
+                </div>
+
+                <div class="button-row">
+                    <button id="autoAdjustBtn">Optimize Settings</button>
+                    <button id="autoCharsBtn">Smart Characters</button>
+                </div>
+
+                <select id="charSetSelect">
+                    <option value="0">Standard: .,:;+*?%S#@</option>
+                    <option value="1">Blocks: ░▒▓█</option>
+                    <option value="2">Fine: ·-~=+*#%@$</option>
+                    <option value="3">Inverted: @%#*+=·</option>
+                    <option value="4">Custom</option>
+                </select>
+
+                <input type="text" id="customChars" class="custom-chars" placeholder="Enter custom characters (e.g., ☯☮✡)" style="display: none;">
+
+                <div class="button-row">
+                    <button id="playBtn" disabled>Play</button>
+                    <button id="pauseBtn" disabled>Pause</button>
+                    <button id="fullscreenBtn">Fullscreen</button>
+                    <button id="captureBtn">Capture Frame</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ascii-output">
+            <div class="fps-counter" id="fpsCounter">FPS: 0</div>
+            <pre id="asciiArt"></pre>
+        </div>
+
+        <div id="advancedSettings" class="advanced-settings">
+            <div class="advanced-settings-header">
+                <h3>Advanced Settings</h3>
+                <button id="closeAdvancedSettings" class="close-button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="slider-control">
+                <label for="fpsLimit">FPS Limit: <span id="fpsLimitValue">30</span></label>
+                <input type="range" id="fpsLimit" min="5" max="60" value="30">
+            </div>
+
+            <div class="advanced-section">
+                <h4>Color Options</h4>
+                <div class="toggle-row">
+                    <span class="toggle-label">Color Mode:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="colorToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div id="colorPaletteContainer" class="palette-disabled">
+                    <label for="colorPalette">Color Palette:</label>
+                    <select id="colorPalette">
+                        <option value="full">Full Color</option>
+                        <option value="grayscale">Grayscale</option>
+                        <option value="sepia">Sepia</option>
+                        <option value="red">Red Scale</option>
+                        <option value="green">Green Scale</option>
+                        <option value="blue">Blue Scale</option>
+                        <option value="custom">Custom Palette</option>
+                    </select>
+
+                    <div id="customPaletteSection" class="custom-palette-section">
+                        <div class="custom-palette-controls">
+                            <label for="colorPicker">Add Color:</label>
+                            <div class="color-picker-container">
+                                <input type="color" id="colorPicker" value="#ff0000">
+                                <button id="addColorBtn">Add</button>
+                            </div>
+                            <div id="palettePreview" class="palette-preview"></div>
+                            <button id="resetPaletteBtn" class="small-button">Reset Palette</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="advanced-section">
+                <h4>Edge Detection</h4>
+                <div class="toggle-row">
+                    <span class="toggle-label">Enabled:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="edgeToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div id="edgeSettings">
+                    <div class="slider-control">
+                        <label for="edgeThreshold">Threshold: <span id="edgeThresholdValue">50</span>%</label>
+                        <input type="range" id="edgeThreshold" min="1" max="100" value="50">
+                    </div>
+                    <div class="slider-control">
+                        <label for="edgeIntensity">Intensity: <span id="edgeIntensityValue">100</span>%</label>
+                        <input type="range" id="edgeIntensity" min="1" max="200" value="100">
+                    </div>
+                </div>
+            </div>
+
+            <div class="advanced-section">
+                <h4>Character Display</h4>
+                
+                <div class="slider-control">
+                    <label for="fontSizeSlider">Font Size: <span id="fontSizeValue">8</span>px</label>
+                    <input type="range" id="fontSizeSlider" min="4" max="20" value="8">
+                </div>
+
+                <div class="slider-control">
+                    <label for="charSpacingX">Horizontal Spacing: <span id="charSpacingXValue">0</span>px</label>
+                    <input type="range" id="charSpacingX" min="-5" max="10" value="0">
+                </div>
+
+                <div class="slider-control">
+                    <label for="charSpacingY">Vertical Spacing: <span id="charSpacingYValue">0</span>px</label>
+                    <input type="range" id="charSpacingY" min="-5" max="10" value="0">
+                </div>
+
+                <label for="fontFamilySelect">Font:</label>
+                <select id="fontFamilySelect">
+                    <option value="monospace">Monospace (Default)</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Consolas">Consolas</option>
+                    <option value="Lucida Console">Lucida Console</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
